@@ -1,0 +1,12 @@
+# Ignore virtual environments
+venv/
+new_env/
+
+# Ignore Python bytecode
+__pycache__/
+*.pyc
+
+# Ignore system files
+.DS_Store
+
+# Add any other specific files or folders you don't want to push
