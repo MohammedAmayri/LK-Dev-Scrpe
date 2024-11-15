@@ -68,4 +68,5 @@ jobs:
         id: deploy-to-webapp
         with:
           app-name: 'lkdevbackend2'
+          slot-name: 'lkdevbackend2-test1'
           package: ./app
