@@ -1,0 +1,30 @@
+name: Build Docker Image
+
+on:
+  workflow_dispatch:
+  # Optionally, you can also trigger on push to a specific branch, e.g., main
+  # push:
+  #   branches:
+  #     - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build Docker image
+        run: |
+          docker build -t restaurant_scraper:latest .
+
+      - name: Save Docker image as artifact
+        run: |
+          docker save restaurant_scraper:latest -o restaurant_scraper.tar
+        # Upload the Docker image as an artifact
+        with:
+          path: restaurant_scraper.tar
