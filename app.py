@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from scrapers.text_scraper import scrape_text
 from scrapers.image_scraper import scrape_image
 from scrapers.pdf_scraper import scrape_pdf
@@ -26,11 +26,16 @@ if not openai_api_key:
     raise Exception("OPENAI_API_KEY is not set.")
 openai.api_key = openai_api_key
 
+# Serve the frontend HTML page
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 @app.route('/scrape-menu', methods=['GET'])
 def scrape_menu():
     format = request.args.get('format')
     link = request.args.get('link')
-    solution = request.args.get('solution')  # New parameter
+    solution = request.args.get('solution')
 
     if not format or not link:
         return jsonify({'error': 'Missing format or link parameter'}), 400
@@ -77,4 +82,4 @@ def scrape_menu():
         return jsonify({'error': 'An error occurred while processing the request'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

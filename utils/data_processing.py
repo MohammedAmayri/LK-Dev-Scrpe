@@ -3,27 +3,25 @@ import json
 import logging
 import certifi
 import os
-from datetime import datetime, timedelta
-import requests.exceptions
-import requests
 import ssl
+from datetime import datetime, timedelta
+import requests
+import requests
 
-# Set SSL_CERT_FILE environment variable
+
+# Set SSL_CERT_FILE environment variable for certifi
 os.environ["SSL_CERT_FILE"] = certifi.where()
 print("SSL_CERT_FILE set to:", os.environ["SSL_CERT_FILE"])
 print(certifi.where())
 
 print("SSL default verify paths:")
 print(ssl.get_default_verify_paths())
-ssl._create_default_https_context = ssl.create_default_context
-ssl._create_default_https_context().load_verify_locations(certifi.where())
+ssl_context = ssl.create_default_context(cafile=certifi.where())
+ssl._create_default_https_context = ssl_context
 print(ssl.OPENSSL_VERSION)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Ensure OpenAI uses certifi's CA bundle for SSL verification
-openai.verify_ssl = certifi.where()
 
 # Set OpenAI API key
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -52,11 +50,11 @@ Additional guidelines:
 6. Ensure the output is a JSON array with the specified fields.
 7. Do not add any new lunch menus not mentioned in the input text.
 8. If the week number is of 3 digits, get rid of the last one.
-9. if the name gets too long. try to shorten it to 2 to 3 words and put the rest in the description instead.
-10. its extremly important to always remebmer to add the tags for the vegan and vegeterian dishes.
+9. If the name gets too long, try to shorten it to 2 to 3 words and put the rest in the description instead.
+10. It's extremely important to always remember to add the tags for vegan and vegetarian dishes.
 
 Text:
-\"\"\"{menu_text}\"\"\"
+\"\"\"{menu_text}\"\"\" 
 
 Return only the JSON array with the fields as specified. Do not include any code snippets or code block markers in your response. For availability, use exact weekday names (Monday, Tuesday, etc.).
 """
@@ -64,10 +62,8 @@ Return only the JSON array with the fields as specified. Do not include any code
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that processes menu data."},
-                {"role": "user", "content": prompt}
-            ],
+            messages=[{"role": "system", "content": "You are a helpful assistant that processes menu data."},
+                      {"role": "user", "content": prompt}],
             max_tokens=1500,
             temperature=0.0,
         )
@@ -82,13 +78,6 @@ Return only the JSON array with the fields as specified. Do not include any code
         else:
             logger.error("Unexpected response format or empty choices.")
             return None
-
-        # Clean the assistant's message by removing code block markers if present
-        if assistant_message.startswith("```") and assistant_message.endswith("```"):
-            assistant_message = assistant_message[3:-3].strip()
-            # Remove language identifier if present
-            if assistant_message.startswith("json"):
-                assistant_message = assistant_message[4:].strip()
 
         # Attempt to parse the cleaned message as JSON
         menu_data = json.loads(assistant_message)
@@ -158,7 +147,7 @@ def add_dates_to_menu(menu_data):
                     logger.warning(f"No valid dates found for item '{item.get('name')}'")
                     item["validFrom"] = {"$date": None}
                     item["validTo"] = {"$date": None}
-                
+
                 # Optionally remove the "week" field if you no longer need it
                 del item["week"]
 

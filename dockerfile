@@ -1,25 +1,27 @@
-# Use an official Python runtime as a base image
+# Start from the Python base image
 FROM python:3.12-slim
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the local project files to the container
+# Copy all project files into the container
 COPY . .
 
-# Install system dependencies for Tesseract, OpenCV, and any other required packages
+# Install dependencies and utilities, including CA certificates and libssl-dev
 RUN apt-get update && \
-    apt-get install -y tesseract-ocr poppler-utils libgl1-mesa-glx && \
-    apt-get clean
+    apt-get install -y tesseract-ocr poppler-utils libgl1-mesa-glx ca-certificates libssl-dev && \
+    apt-get clean && \
+    update-ca-certificates
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install pip, certifi and necessary dependencies with SSL verification temporarily disabled for pip
+RUN pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org --trusted-host pypi.python.org \
+    certifi pip-system-certs gunicorn -r requirements.txt --disable-pip-version-check
 
-# Set environment variable for Tesseract path (if needed)
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
+# Set SSL_CERT_FILE environment variable to use certifi's CA bundle
+ENV SSL_CERT_FILE=/usr/local/lib/python3.12/site-packages/certifi/cacert.pem
 
-# Expose the port your app runs on (default for Flask is 5000)
+# Expose the port Flask is using
 EXPOSE 5000
 
-# Run the application
-CMD ["python", "app.py"]
+# Run the app with gunicorn
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
