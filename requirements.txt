@@ -1,17 +1,21 @@
+# DO NOT include azure-functions-worker in this file
+# The Python Worker is managed by Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues
+
+azure-functions==1.13.3
+flask==3.0.3
+openai==0.28.0
+python-dotenv==1.0.1
+requests==2.32.3
 beautifulsoup4==4.12.3
 certifi==2024.8.30
-Flask==3.0.3
-numpy==1.23.0
-openai==0.28.0
+numpy==1.21.6  # Downgraded for compatibility with numba
 opencv_python==4.10.0.84
 opencv_python_headless==4.10.0.84
 pdf2image==1.17.0
-Pillow==10.0.1  # Updated to a version compatible with Python 3.8
 pymongo==4.10.1
 PyPDF2==3.0.1
 pytesseract==0.3.13
-python-dotenv==1.0.1
-Requests==2.32.3
 selenium==4.26.1
 webdriver_manager==4.0.2
 aiohttp>=3.8.0,<4.0
