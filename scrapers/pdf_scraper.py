@@ -604,7 +604,7 @@ def preprocess_image_for_ocr(image):
     """
     Applies preprocessing steps to the image to enhance OCR accuracy.
     """
-    # Convert PIL image to grayscale
+    # Convert PIL image to grayscale 
     gray_image = image.convert("L")
     # Increase contrast and apply thresholding
     np_image = np.array(gray_image)
