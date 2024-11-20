@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Menu Scraper</title>
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Restaurant Menu Scraper</h1>
+        <form id="scrapeForm">
+            <label for="format">Select Format:</label>
+            <select id="format" name="format" required>
+                <option value="TEXT">Text</option>
+                <option value="PDF">PDF</option>
+                <option value="IMAGE">Image</option>
+                <option value="FACEBOOK POST">Facebook Post</option>
+                <option value="DYNAMIC">Dynamic Content</option>
+            </select>
+
+            <label for="link">Enter the Link:</label>
+            <input type="url" id="link" name="link" placeholder="Enter the URL" required>
+
+            <label for="solution">Solution (Optional):</label>
+            <input type="text" id="solution" name="solution" placeholder="Enter a solution if any">
+
+            <button type="submit">Scrape Menu</button>
+        </form>
+
+        <div id="response">
+            <!-- JSON response will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // Handling form submission
+        $(document).ready(function () {
+            $("#scrapeForm").submit(function (event) {
+                event.preventDefault();  // Prevent form from reloading the page
+                
+                const format = $("#format").val();
+                const link = $("#link").val();
+                const solution = $("#solution").val();
+                
+                // Send the GET request to the Flask API
+                $.get(`/scrape-menu?format=${format}&link=${link}&solution=${solution}`, function (data) {
+                    if (data.error) {
+                        $("#response").html(`<p class="error">${data.error}</p>`);
+                    } else {
+                        // Display the menu data as formatted JSON
+                        $("#response").html(`<pre>${JSON.stringify(data.lunch_menus, null, 4)}</pre>`);
+                    }
+                }).fail(function () {
+                    $("#response").html(`<p class="error">There was an error processing your request.</p>`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

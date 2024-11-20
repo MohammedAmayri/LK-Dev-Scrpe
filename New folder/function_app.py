@@ -11,6 +11,7 @@ import os
 import logging
 import openai
 
+# Initialize Flask app
 app = Flask(__name__)
 
 # Load environment variables
@@ -88,4 +89,27 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     # Create a Flask context and use it to call the Flask app
     with app.test_request_context(req.method, path=req.url, data=req.get_data()):
         return app.full_dispatch_request()
+
+# Function to handle the HTTP request
+@app.function_name(name="HttpTrigger3")
+@app.route(route="http_trigger", auth_level=func.AuthLevel.ANONYMOUS)  # Set authorization to ANONYMOUS
+def http_trigger(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Python HTTP trigger function processed a request.')
+
+    name = req.params.get('name')
+    if not name:
+        try:
+            req_body = req.get_json()
+        except ValueError:
+            pass
+        else:
+            name = req_body.get('name')
+
+    if name:
+        return func.HttpResponse(f"Hello, {name}. This HTTP triggered function executed successfully.")
+    else:
+        return func.HttpResponse(
+             "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.",
+             status_code=200
+        )
 
