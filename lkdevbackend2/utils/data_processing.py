@@ -1,15 +1,11 @@
+# data_processing.py
 import openai
 import json
 import logging
-import certifi
 import os
-import ssl
+import requests
 from datetime import datetime, timedelta
-import requests
-import requests
 
-
-# Set SSL_CERT_FILE environment variable for certifi
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -20,8 +16,14 @@ if not openai_api_key:
     raise Exception("OPENAI_API_KEY is not set.")
 openai.api_key = openai_api_key
 
-def process_menu_text(menu_text):
-    prompt = f"""
+def process_menu_text(menu_text, custom_prompt=None):
+    if custom_prompt:
+        if "{menu_text}" not in custom_prompt:
+            prompt = custom_prompt + f'\n\nText:\n"""{menu_text}"""'
+        else:
+            prompt = custom_prompt.format(menu_text=menu_text)
+    else:
+        prompt = f"""
 Extract the lunch menu for the week from the following text and format it as a JSON array with the following fields:
 - "name": Dish name
 - "description": Brief description
@@ -29,7 +31,7 @@ Extract the lunch menu for the week from the following text and format it as a J
 - "availability": Days when the dish is available (e.g., ["Monday", "Tuesday", "Wednesday"]). Use only the days explicitly mentioned. If no days are mentioned, leave it empty.
 - "allergies": Possible food allergies (e.g., 'milk', 'gluten', etc.), if clearly indicated.
 - "tags": Relevant tags such as "Vegetarian", "Vegan", "Gluten-Free".
-- "week": Week number (e.g., 34 for V34). If no week number is present, send back the first clear date that you see as part of the text(turning it to week number of year 2024).
+- "week": Week number (e.g., 34 for V34). If no week number is present, send back the first clear date that you see as part of the text (turning it to week number of year 2024).
 
 Additional guidelines:
 1. Ignore all items after the word "À la carte at all times".
@@ -44,16 +46,16 @@ Additional guidelines:
 10. It's extremely important to always remember to add the tags for vegan and vegetarian dishes.
 
 Text:
-\"\"\"{menu_text}\"\"\" 
+\"\"\"{menu_text}\"\"\"
 
 Return only the JSON array with the fields as specified. Do not include any code snippets or code block markers in your response. For availability, use exact weekday names (Monday, Tuesday, etc.).
 """
-
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4o-mini",
-            messages=[{"role": "system", "content": "You are a helpful assistant that processes menu data."},
-                      {"role": "user", "content": prompt}],
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant that processes menu data."},
+                {"role": "user", "content": prompt}],
             max_tokens=1500,
             temperature=0.0,
         )

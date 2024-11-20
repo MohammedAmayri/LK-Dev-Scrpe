@@ -102,19 +102,27 @@ def lkdevbackend2():
         - format: Menu format (PDF, TEXT, IMAGE, etc.)
         - link: URL to scrape
         - solution: (Optional) Additional parameter for certain formats
+    Body (if POST):
+        - customPrompt: (Optional) Custom prompt provided by the user for OpenAI processing
     """
     logger.info("Processing lkdevbackend2 request.")
 
     format = request.args.get("format")
     link = request.args.get("link")
     solution = request.args.get("solution")
+    custom_prompt = None
+
+    # Check if POST request and get customPrompt from JSON body
+    if request.method == 'POST':
+        data = request.get_json()
+        custom_prompt = data.get('customPrompt')
 
     # Validate required parameters
     if not format or not link:
         logger.warning("Missing 'format' or 'link' parameter.")
         return jsonify({"error": "Missing 'format' or 'link' parameter"}), 400
 
-    logger.info(f"Received request: format={format}, link={link}, solution={solution}")
+    logger.info(f"Received request: format={format}, link={link}, solution={solution}, custom_prompt={'Yes' if custom_prompt else 'No'}")
 
     try:
         # Dispatch the request based on the format
@@ -138,7 +146,7 @@ def lkdevbackend2():
             return jsonify({"error": "Failed to retrieve menu text"}), 500
 
         # Process the scraped text into structured menu data
-        lunch_menus = process_menu_text(menu_text)
+        lunch_menus = process_menu_text(menu_text, custom_prompt)
 
         # If processing failed
         if not lunch_menus:
