@@ -45,7 +45,7 @@ Additional guidelines:
 9. If the name gets too long, try to shorten it to 2 to 3 words and put the rest in the description instead.
 10. It's extremely important to always remember to add the tags for vegan and vegetarian dishes.
 11. if the price for the menu is mentioned, add it to every lunch if its not changed with special price.
-
+12. To make sure that the week number is correct use one or multiple mentioned dates with the days (if exist), use the date knowing its the year 2024 to calculate the week number
 Text:
 \"\"\"{menu_text}\"\"\"
 
