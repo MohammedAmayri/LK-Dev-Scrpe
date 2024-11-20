@@ -44,6 +44,7 @@ Additional guidelines:
 8. If the week number is of 3 digits, get rid of the last one.
 9. If the name gets too long, try to shorten it to 2 to 3 words and put the rest in the description instead.
 10. It's extremely important to always remember to add the tags for vegan and vegetarian dishes.
+11. if the price for the menu is mentioned, add it to every lunch if its not changed with special price.
 
 Text:
 \"\"\"{menu_text}\"\"\"
