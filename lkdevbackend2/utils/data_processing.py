@@ -46,6 +46,7 @@ Additional guidelines:
 10. It's extremely important to always remember to add the tags for vegan and vegetarian dishes.
 11. if the price for the menu is mentioned, add it to every lunch if its not changed with special price.
 12. To make sure that the week number is correct use one or multiple mentioned dates with the days (if exist), use the date knowing its the year 2024 to calculate the week number
+13. When the meal name has the word "Veckans vegetariska", this meal is for the whole week." to catch the veg meal for the whole week.
 Text:
 \"\"\"{menu_text}\"\"\"
 
