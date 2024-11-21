@@ -34,7 +34,7 @@ Extract the lunch menu for the week from the following text and format it as a J
 - "week": Week number (e.g., 34 for V34). If no week number is present, send back the first clear date that you see as part of the text (turning it to week number of year 2024).
 
 Additional guidelines:
-1. Ignore all items after the word "À la carte at all times".
+1. Ignore all items after the word "À la carte at all times", Sometimes also called "Klassiker"
 2. Ignore any irrelevant or gibberish data before generating the menus.
 3. Do not assign availability to days not explicitly mentioned. If no days are specified, leave "availability" empty.
 4. If no allergies or tags are specified, leave those fields as empty lists.
@@ -47,7 +47,10 @@ Additional guidelines:
 11. if the price for the menu is mentioned, add it to every lunch if its not changed with special price.
 12. To make sure that the week number is correct use one or multiple mentioned dates with the days (if exist), use the date knowing its the year 2024 to calculate the week number
 13. When the meal name has the word "Veckans vegetariska", this meal is for the whole week." to catch the veg meal for the whole week.
-14.if you find Lunch buffe without any day beside that, it means that the lunch buffe is for the whole week" to catch that the lucnh buffe is for the whole week.
+14.if you find Lunch buffe without any day beside that, it means that the lunch buffe is for the whole week" to catch that the lucnh buffe is for the whole week.But it has to say Lunchbuffe not only buffe
+15. if the Vegetarian menu does not include any description, do not include it.
+16.if the menu expands over multiple weeks, focus on the current week number now its: week 47(take into consideration that its a odd week)
+17.take into consideration that some days could include multiple menus.
 Text:
 \"\"\"{menu_text}\"\"\"
 
