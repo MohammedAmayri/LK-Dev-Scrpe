@@ -1,10 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import time
 
 def scrape_text(url):
     try:
         response = requests.get(url, verify=False)
+        time.sleep(2)  # Add a delay before processing
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f"Failed to fetch {url}: {e}")

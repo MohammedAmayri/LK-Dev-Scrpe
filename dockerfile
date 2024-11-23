@@ -1,27 +1,38 @@
-# Start from the Python base image
-FROM python:3.12-slim
+# Use Python base image
+FROM python:3.11-slim-bullseye
 
-# Set working directory
+# Install CA certificates and other dependencies, including the Swedish Tesseract language pack
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    tesseract-ocr \
+    tesseract-ocr-swe \  # Add Swedish language pack
+    poppler-utils \
+    python3-dev \
+    build-essential \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy the Zscaler certificate into the container
+COPY Zscaler.crt /usr/local/share/ca-certificates/Zscaler.crt
+
+# Add Zscaler's certificate to the trusted CA bundle
+RUN update-ca-certificates
+
+# Upgrade pip and setuptools
+RUN pip install --upgrade pip setuptools wheel
+
+# Set the working directory
 WORKDIR /app
 
-# Copy all project files into the container
-COPY . .
+# Copy application code
+COPY . /app
 
-# Install dependencies and utilities, including CA certificates and libssl-dev
-RUN apt-get update && \
-    apt-get install -y tesseract-ocr poppler-utils libgl1-mesa-glx ca-certificates libssl-dev && \
-    apt-get clean && \
-    update-ca-certificates
+# Install Python dependencies
+RUN pip install --no-cache-dir --trusted-host pypi.org --trusted-host files.pythonhosted.org -r requirements.txt
 
-# Install pip, certifi and necessary dependencies with SSL verification temporarily disabled for pip
-RUN pip install --upgrade pip --trusted-host pypi.org --trusted-host files.pythonhosted.org --trusted-host pypi.python.org \
-    certifi pip-system-certs gunicorn -r requirements.txt --disable-pip-version-check
+# Expose port
+EXPOSE 8080
 
-# Set SSL_CERT_FILE environment variable to use certifi's CA bundle
-ENV SSL_CERT_FILE=/usr/local/lib/python3.12/site-packages/certifi/cacert.pem
-
-# Expose the port Flask is using
-EXPOSE 5000
-
-# Run the app with gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+# Run the application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8080"]
